@@ -1,4 +1,4 @@
-import { takeEvery } from "redux-saga/effects";
+import { getContext, takeEvery } from "redux-saga/effects";
 import * as postsAPI from "../api/posts";
 import {
   createPromiseSaga,
@@ -15,6 +15,7 @@ const GET_POSTS_ERROR = "GET_POSTS_ERROR";
 const GET_POST = "GET_POST";
 const GET_POST_SUCCESS = "GET_POST_SUCCESS";
 const GET_POST_ERROR = "GET_POST_ERROR";
+const GO_TO_HOME = "GO_TO_HOME";
 
 const CLEAR_POST = "CLEAR_POST";
 
@@ -27,17 +28,18 @@ export const getPost = (id) => ({
 
 const getPostsSaga = createPromiseSaga(GET_POSTS, postsAPI.getPosts);
 const getPostSaga = createPromiseSagaById(GET_POST, postsAPI.getPostById);
+function* goToHomeSaga() {
+  const history = yield getContext("history");
+  history.push("/");
+}
 
 export function* postsSaga() {
   yield takeEvery(GET_POSTS, getPostsSaga);
   yield takeEvery(GET_POST, getPostSaga);
+  yield takeEvery(GO_TO_HOME, goToHomeSaga);
 }
 
-export const goToHome =
-  () =>
-  (dispatch, getState, { history }) => {
-    history.push("/");
-  };
+export const goToHome = () => ({ type: GO_TO_HOME });
 
 export const clearPost = () => ({ type: CLEAR_POST });
 
