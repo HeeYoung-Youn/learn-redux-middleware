@@ -1,7 +1,8 @@
+import { takeEvery } from "redux-saga/effects";
 import * as postsAPI from "../api/posts";
 import {
-  createPromiseThunk,
-  createPromiseThunkById,
+  createPromiseSaga,
+  createPromiseSagaById,
   handleAsyncActions,
   handleAsyncActionsById,
   reducerUtils,
@@ -17,8 +18,21 @@ const GET_POST_ERROR = "GET_POST_ERROR";
 
 const CLEAR_POST = "CLEAR_POST";
 
-export const getPosts = createPromiseThunk(GET_POSTS, postsAPI.getPosts);
-export const getPost = createPromiseThunkById(GET_POST, postsAPI.getPostById);
+export const getPosts = () => ({ type: GET_POSTS });
+export const getPost = (id) => ({
+  type: GET_POST,
+  payload: id,
+  meta: id,
+});
+
+const getPostsSaga = createPromiseSaga(GET_POSTS, postsAPI.getPosts);
+const getPostSaga = createPromiseSagaById(GET_POST, postsAPI.getPostById);
+
+export function* postsSaga() {
+  yield takeEvery(GET_POSTS, getPostsSaga);
+  yield takeEvery(GET_POST, getPostSaga);
+}
+
 export const goToHome =
   () =>
   (dispatch, getState, { history }) => {
